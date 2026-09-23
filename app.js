@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initContactForm();
   initPrintCvButton();
   initNavigation();
+  initDesignShowcase();
 });
 
 /* ==========================================================================
@@ -543,3 +544,298 @@ function initNavigation() {
     });
   });
 }
+
+/* ==========================================================================
+   11. Graphic Design Showcase Carousel & Lightbox Modal (Zero-Redirect)
+   ========================================================================== */
+const defaultDesignProjects = [
+  {
+    id: "hcp-symposium-poster",
+    title: "Healthcare Innovation Symposium",
+    category: "poster",
+    categoryLabel: "Posters & Flyers",
+    imageUrl: "assets/designs/health_symposium.jpg",
+    year: "2024",
+    tools: ["Adobe Illustrator", "Photoshop", "Typography"],
+    description: "Official promotional poster and visual system for the Healthcare Professionals Innovation Symposium. Designed with high-contrast geometric layouts and warm earthen tones to communicate medical advancement and clinical accessibility."
+  },
+  {
+    id: "nd-brand-guidelines",
+    title: "Executive ND Brand & Stationery Identity",
+    category: "brand",
+    categoryLabel: "Brand Identity",
+    imageUrl: "assets/designs/brand_identity.jpg",
+    year: "2024",
+    tools: ["Adobe Illustrator", "Figma", "Print Production"],
+    description: "Comprehensive brand guideline book, custom gold foil monogram typography, executive stationery, and minimalist color specification designed for professional and research ventures."
+  },
+  {
+    id: "clinical-pharmacy-guide",
+    title: "Clinical Pharmacy Medication Safety Guide",
+    category: "campaign",
+    categoryLabel: "Health Campaigns",
+    imageUrl: "assets/designs/antibiotic_safety.jpg",
+    year: "2024",
+    tools: ["Canva Pro", "Photoshop", "Data Visuals"],
+    description: "Visual patient-safety infographic created for community health outreach, breaking down medication administration principles, error prevention metrics, and pharmacist intervention workflows."
+  },
+  {
+    id: "youth-innovation-summit",
+    title: "Youth Innovation Summit Roll-up Banner",
+    category: "digital",
+    categoryLabel: "Social & Digital",
+    imageUrl: "assets/designs/creative_campaign.jpg",
+    year: "2024",
+    tools: ["Adobe Photoshop", "InDesign", "Event Collateral"],
+    description: "Striking 33x79 inch roll-up conference display banner and promotional social flyers incorporating West African geometric patterns fused with modern tech hackathon aesthetics."
+  }
+];
+
+let activeDesigns = [...defaultDesignProjects];
+
+async function initDesignShowcase() {
+  const track = document.getElementById('designCarouselTrack');
+  if (!track) return;
+
+  // Attempt to fetch synced designs (GitHub Pages static json or local/Vercel serverless)
+  try {
+    let res = await fetch('assets/designs.json');
+    if (!res.ok) {
+      res = await fetch('/api/designs');
+    }
+    if (res.ok) {
+      const data = await res.json();
+      const items = Array.isArray(data) ? data : (data.items || []);
+      if (items.length > 0) {
+        activeDesigns = items.map(item => ({
+          ...item,
+          categoryLabel: item.category,
+          category: normalizeCategory(item.category)
+        }));
+      }
+    }
+  } catch (e) {
+    // Graceful offline fallback to default starter designs
+  }
+
+  renderDesignCards('all');
+  initCarouselControls();
+  initDesignLightbox();
+  initCategoryFilters();
+}
+
+function normalizeCategory(cat) {
+  if (!cat) return 'poster';
+  const c = String(cat).toLowerCase();
+  if (c.includes('brand') || c.includes('logo') || c.includes('identity')) return 'brand';
+  if (c.includes('campaign') || c.includes('health') || c.includes('clinic')) return 'campaign';
+  if (c.includes('social') || c.includes('digital') || c.includes('ui') || c.includes('app')) return 'digital';
+  return 'poster';
+}
+
+function renderDesignCards(filter = 'all') {
+  const track = document.getElementById('designCarouselTrack');
+  const dotsContainer = document.getElementById('carouselDots');
+  if (!track) return;
+
+  const filtered = filter === 'all' 
+    ? activeDesigns 
+    : activeDesigns.filter(d => d.category === filter);
+
+  if (filtered.length === 0) {
+    track.innerHTML = `
+      <div style="padding: 2.5rem; text-align: center; color: var(--text-muted); width: 100%;">
+        <i class="fa-solid fa-folder-open" style="font-size: 2rem; margin-bottom: 0.75rem;"></i>
+        <p>No designs found in this category yet.</p>
+      </div>
+    `;
+    if (dotsContainer) dotsContainer.innerHTML = '';
+    return;
+  }
+
+  track.innerHTML = filtered.map((item) => `
+    <article class="design-card" data-id="${item.id}" data-category="${item.category}" tabindex="0" role="button" aria-label="View ${item.title}">
+      <div class="design-card-media">
+        <span class="design-category-tag">${item.categoryLabel || 'Design'}</span>
+        <span class="design-year-tag">${item.year || '2024'}</span>
+        <img src="${item.imageUrl}" alt="${item.title}" class="design-thumb-img" loading="lazy">
+        <div class="design-card-overlay">
+          <span class="inspect-pill"><i class="fa-solid fa-expand"></i> Inspect Artwork</span>
+        </div>
+      </div>
+      <div class="design-card-body">
+        <h3 class="design-card-title">${item.title}</h3>
+        <p class="design-card-desc">${item.description || ''}</p>
+        <div class="design-tools-row">
+          ${(item.tools || []).map(t => `<span class="tool-badge">${t}</span>`).join('')}
+        </div>
+      </div>
+    </article>
+  `).join('');
+
+  // Attach click listener for lightbox
+  track.querySelectorAll('.design-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const id = card.getAttribute('data-id');
+      const item = activeDesigns.find(d => String(d.id) === String(id));
+      if (item) openDesignLightbox(item);
+    });
+
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const id = card.getAttribute('data-id');
+        const item = activeDesigns.find(d => String(d.id) === String(id));
+        if (item) openDesignLightbox(item);
+      }
+    });
+  });
+
+  renderCarouselDots(filtered.length);
+  updateArrowStates();
+}
+
+function initCarouselControls() {
+  const track = document.getElementById('designCarouselTrack');
+  const prevBtn = document.getElementById('carouselPrevBtn');
+  const nextBtn = document.getElementById('carouselNextBtn');
+  if (!track || !prevBtn || !nextBtn) return;
+
+  const scrollAmount = 370;
+
+  prevBtn.addEventListener('click', () => {
+    track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+  });
+
+  nextBtn.addEventListener('click', () => {
+    track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  });
+
+  track.addEventListener('scroll', () => {
+    updateArrowStates();
+    updateActiveDot();
+  }, { passive: true });
+}
+
+function updateArrowStates() {
+  const track = document.getElementById('designCarouselTrack');
+  const prevBtn = document.getElementById('carouselPrevBtn');
+  const nextBtn = document.getElementById('carouselNextBtn');
+  if (!track || !prevBtn || !nextBtn) return;
+
+  const isAtStart = track.scrollLeft <= 5;
+  const isAtEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 5;
+
+  prevBtn.disabled = isAtStart;
+  nextBtn.disabled = isAtEnd;
+}
+
+function renderCarouselDots(count) {
+  const dotsContainer = document.getElementById('carouselDots');
+  if (!dotsContainer) return;
+
+  dotsContainer.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const dot = document.createElement('button');
+    dot.className = `carousel-dot ${i === 0 ? 'active' : ''}`;
+    dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+    dot.addEventListener('click', () => {
+      const track = document.getElementById('designCarouselTrack');
+      const cards = track ? track.querySelectorAll('.design-card') : [];
+      if (cards[i]) {
+        cards[i].scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+      }
+    });
+    dotsContainer.appendChild(dot);
+  }
+}
+
+function updateActiveDot() {
+  const track = document.getElementById('designCarouselTrack');
+  const dots = document.querySelectorAll('.carousel-dot');
+  if (!track || dots.length === 0) return;
+
+  const cards = track.querySelectorAll('.design-card');
+  if (cards.length === 0) return;
+
+  const trackCenter = track.getBoundingClientRect().left + track.clientWidth / 2;
+  let closestIndex = 0;
+  let minDiff = Infinity;
+
+  cards.forEach((card, index) => {
+    const rect = card.getBoundingClientRect();
+    const cardCenter = rect.left + rect.width / 2;
+    const diff = Math.abs(trackCenter - cardCenter);
+    if (diff < minDiff) {
+      minDiff = diff;
+      closestIndex = index;
+    }
+  });
+
+  dots.forEach((dot, idx) => {
+    dot.classList.toggle('active', idx === closestIndex);
+  });
+}
+
+function initCategoryFilters() {
+  const filterButtons = document.querySelectorAll('.design-filter-btn');
+  filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.getAttribute('data-filter');
+      renderDesignCards(filter);
+      const track = document.getElementById('designCarouselTrack');
+      if (track) track.scrollTo({ left: 0, behavior: 'smooth' });
+    });
+  });
+}
+
+function initDesignLightbox() {
+  const modal = document.getElementById('designLightboxModal');
+  const closeBtn = document.getElementById('designModalCloseBtn');
+  if (!modal) return;
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => modal.close());
+  }
+
+  modal.addEventListener('click', (e) => {
+    const rect = modal.getBoundingClientRect();
+    if (
+      e.clientX < rect.left ||
+      e.clientX > rect.right ||
+      e.clientY < rect.top ||
+      e.clientY > rect.bottom
+    ) {
+      modal.close();
+    }
+  });
+}
+
+function openDesignLightbox(item) {
+  const modal = document.getElementById('designLightboxModal');
+  const content = document.getElementById('designLightboxContent');
+  if (!modal || !content) return;
+
+  content.innerHTML = `
+    <div class="lightbox-image-container">
+      <img src="${item.imageUrl}" alt="${item.title}" class="lightbox-full-img">
+    </div>
+    <div class="lightbox-meta-header">
+      <h2 id="designModalTitle" class="lightbox-title">${item.title}</h2>
+      <div class="lightbox-tags">
+        <span class="tool-badge" style="background: var(--color-caramel); color: #fff;">${item.categoryLabel || item.category}</span>
+        <span class="tool-badge">${item.year || '2024'}</span>
+      </div>
+    </div>
+    <p class="lightbox-desc">${item.description || ''}</p>
+    <div class="lightbox-tools-section">
+      <span class="lightbox-tools-title"><i class="fa-solid fa-wrench"></i> Creative Tools:</span>
+      ${(item.tools || []).map(t => `<span class="tool-badge">${t}</span>`).join('')}
+    </div>
+  `;
+
+  modal.showModal();
+}
+

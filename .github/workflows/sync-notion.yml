@@ -1,0 +1,40 @@
+name: Sync Notion Designs to GitHub Pages
+
+on:
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab with one click
+  schedule:
+    - cron: '0 */6 * * *' # Automatically runs every 6 hours to check for new designs
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Sync Designs from Notion
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+        run: |
+          npm run sync-notion
+
+      - name: Commit and Push if Changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/designs.json assets/designs/
+          if git diff --staged --quiet; then
+            echo "No new designs to commit."
+          else
+            git commit -m "Auto-sync graphic design portfolio from Notion"
+            git push
+          fi

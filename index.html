@@ -58,6 +58,7 @@
       <nav class="nav-menu" id="navMenu" aria-label="Main Navigation">
         <a href="#about" class="nav-link">About</a>
         <a href="#projects" class="nav-link">Projects</a>
+        <a href="#designs" class="nav-link">Designs</a>
         <a href="#experience" class="nav-link">Journey</a>
         <a href="#skills" class="nav-link">Capabilities</a>
         <a href="#certificates" class="nav-link">Recognition</a>
@@ -771,6 +772,64 @@
       </div>
     </section>
 
+    <!-- Creative Direction & Graphic Design Showcase Carousel Section -->
+    <section class="designs-section" id="designs">
+      <div class="container">
+        <div class="section-header text-center">
+          <span class="section-badge"><i class="fa-solid fa-palette"></i> Creative Direction & Visual Design</span>
+          <h2 class="section-title">Graphic Design Showcase</h2>
+          <p class="section-subtitle">Visual identities, health campaign flyers, event posters, and digital graphics crafted to communicate complex ideas with clarity and elegance.</p>
+        </div>
+
+        <!-- Category Filter Pills -->
+        <div class="design-filter-container">
+          <button class="design-filter-btn active" data-filter="all">
+            <i class="fa-solid fa-layer-group"></i> All Works
+          </button>
+          <button class="design-filter-btn" data-filter="poster">
+            <i class="fa-solid fa-file-lines"></i> Posters & Flyers
+          </button>
+          <button class="design-filter-btn" data-filter="brand">
+            <i class="fa-solid fa-bezier-curve"></i> Brand Identity
+          </button>
+          <button class="design-filter-btn" data-filter="campaign">
+            <i class="fa-solid fa-heart-pulse"></i> Health Campaigns
+          </button>
+          <button class="design-filter-btn" data-filter="digital">
+            <i class="fa-solid fa-display"></i> Social & Digital
+          </button>
+        </div>
+
+        <!-- Carousel Wrapper with Navigation Arrows -->
+        <div class="design-carousel-wrapper">
+          <button class="carousel-arrow carousel-arrow-left" id="carouselPrevBtn" aria-label="Previous designs" title="Scroll left">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+
+          <div class="design-carousel-track" id="designCarouselTrack" tabindex="0" role="region" aria-label="Graphic design projects carousel">
+            <!-- Dynamically populated via app.js (Notion live sync or curated portfolio items) -->
+          </div>
+
+          <button class="carousel-arrow carousel-arrow-right" id="carouselNextBtn" aria-label="Next designs" title="Scroll right">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <!-- Carousel Indicators / Dot Pagination -->
+        <div class="carousel-dots-container" id="carouselDots">
+          <!-- Dynamically populated dots -->
+        </div>
+
+        <!-- Interactive Tips & Lightbox Prompt -->
+        <div class="design-carousel-footer">
+          <div class="footer-tip">
+            <i class="fa-solid fa-expand"></i>
+            <span>Click any design to view full high-resolution artwork and design rationale directly on this page</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Journey / Work Experience & Leadership Dual-Track Section -->
     <section class="experience-section" id="experience">
       <div class="container">
@@ -1424,6 +1483,18 @@
         <i class="fa-solid fa-xmark"></i>
       </button>
       <div id="modalContent" class="modal-inner">
+        <!-- Dynamically populated via app.js -->
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Graphic Design Full-Screen Lightbox Modal (Zero-Redirect Viewer) -->
+  <dialog id="designLightboxModal" class="custom-modal design-lightbox-modal" aria-labelledby="designModalTitle">
+    <div class="modal-card design-lightbox-card">
+      <button class="modal-close-btn" id="designModalCloseBtn" aria-label="Close design preview">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div id="designLightboxContent" class="design-lightbox-inner">
         <!-- Dynamically populated via app.js -->
       </div>
     </div>
