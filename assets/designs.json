@@ -1,6 +1,28 @@
 {
-  "syncedAt": "2026-09-23T10:42:08.566Z",
+  "syncedAt": "2026-09-23T16:01:04.902Z",
   "items": [
+    {
+      "id": "3e4c890e-cf4d-8014-b071-d1cdaaacf87b",
+      "title": "World Pneumonia Day",
+      "category": "Health Campaigns",
+      "imageUrl": "assets/designs/notion_3e4c890ecf4d8014b071d1cdaaacf87b.png",
+      "description": "",
+      "tools": [
+        "Canva"
+      ],
+      "year": "2025"
+    },
+    {
+      "id": "3e4c890e-cf4d-80c4-b383-f9964b67bf96",
+      "title": "Antimicrobial Awareness Week Flyer",
+      "category": "Health Campaigns",
+      "imageUrl": "assets/designs/notion_3e4c890ecf4d80c4b383f9964b67bf96.png",
+      "description": "",
+      "tools": [
+        "Canva"
+      ],
+      "year": "2025"
+    },
     {
       "id": "3e4c890e-cf4d-80c5-b89b-dd7a7422f672",
       "title": "Awareness Flyer fo Men’s Health",
