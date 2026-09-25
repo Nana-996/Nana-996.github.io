@@ -1,6 +1,26 @@
 {
-  "syncedAt": "2026-09-24T21:05:49.148Z",
+  "syncedAt": "2026-09-25T03:14:44.316Z",
   "items": [
+    {
+      "id": "3e6c890e-cf4d-806b-b2b1-f8b7b6eedadd",
+      "title": "Glory Valley School Logo",
+      "category": "Graphic Design",
+      "imageUrl": "assets/designs/notion_3e6c890ecf4d806bb2b1f8b7b6eedadd.png",
+      "description": "",
+      "tools": [],
+      "year": "2026"
+    },
+    {
+      "id": "3e6c890e-cf4d-8089-b5f5-e17000c339b5",
+      "title": "Independence Day Flyer",
+      "category": "Graphic Design",
+      "imageUrl": "assets/designs/notion_3e6c890ecf4d8089b5f5e17000c339b5.png",
+      "description": "",
+      "tools": [
+        "Canva"
+      ],
+      "year": "2026"
+    },
     {
       "id": "3e4c890e-cf4d-8014-b071-d1cdaaacf87b",
       "title": "World Pneumonia Day",
